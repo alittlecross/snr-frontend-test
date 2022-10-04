@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "node build.js",
     "lint": "eslint .",
     "start": "nodemon server.js",
     "test": "mocha test/unit --recursive"
@@ -23,6 +24,7 @@
     "eslint-plugin-mocha": "^10.1.0",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.20",
+    "sass": "^1.55.0",
     "sinon": "^14.0.1"
   }
 }

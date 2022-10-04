@@ -10,6 +10,7 @@ Please complete the following node based exercise. It should take around 1 hour 
 
 ```
 $ npm install
+$ npm run build
 $ npm start
 ```
 
