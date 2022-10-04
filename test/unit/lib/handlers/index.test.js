@@ -7,7 +7,9 @@ const { addresses } = require('../../../stub-data');
 
 describe('lib/handlers/index.js', () => {
   let api;
+  let err;
   let get;
+  let next;
   let post;
   let req;
   let res;
@@ -19,7 +21,9 @@ describe('lib/handlers/index.js', () => {
   });
 
   beforeEach(() => {
-    api = sandbox.fake.returns(addresses);
+    api = sandbox.stub();
+    err = new Error('an api error');
+    next = sandbox.fake();
 
     req = {
       body: {},
@@ -54,34 +58,66 @@ describe('lib/handlers/index.js', () => {
 
   describe('post()', () => {
     context('!error', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         req.body.postcode = 'NE15 6BW';
 
         validate.returns(null);
-
-        await post(req, res);
       });
 
-      it('should call validate()', () => {
-        expect(validate.callCount).to.equal(1);
+      context('try', () => {
+        beforeEach(async () => {
+          api.returns(addresses);
 
-        expect(validate.getCall(0).args).to.deep.equal([{
-          postcode: 'NE15 6BW',
-        }]);
+          await post(req, res, next);
+        });
+
+        it('should call validate()', () => {
+          expect(validate.callCount).to.equal(1);
+
+          expect(validate.getCall(0).args).to.deep.equal([{
+            postcode: 'NE15 6BW',
+          }]);
+        });
+
+        it('should call api()', () => {
+          expect(api.callCount).to.equal(1);
+          expect(api.getCall(0).args).to.deep.equal(['NE15 6BW']);
+        });
+
+        it('should add the api response to the session', () => {
+          expect(req.session.addresses).to.deep.equal(addresses);
+        });
+
+        it('should call res.redirect()', () => {
+          expect(res.redirect.callCount).to.equal(1);
+          expect(res.redirect.getCall(0).args).to.deep.equal(['/addresses']);
+        });
       });
 
-      it('should call api()', () => {
-        expect(api.callCount).to.equal(1);
-        expect(api.getCall(0).args).to.deep.equal(['NE15 6BW']);
-      });
+      context('catch', () => {
+        beforeEach(async () => {
+          api.throws(err);
 
-      it('should add the api response to the session', () => {
-        expect(req.session.addresses).to.deep.equal(addresses);
-      });
+          await post(req, res, next);
+        });
 
-      it('should call res.redirect()', () => {
-        expect(res.redirect.callCount).to.equal(1);
-        expect(res.redirect.getCall(0).args).to.deep.equal(['/addresses']);
+        it('should call validate()', () => {
+          expect(validate.callCount).to.equal(1);
+
+          expect(validate.getCall(0).args).to.deep.equal([{
+            postcode: 'NE15 6BW',
+          }]);
+        });
+
+        it('should call api()', () => {
+          expect(api.callCount).to.equal(1);
+          expect(api.getCall(0).args).to.deep.equal(['NE15 6BW']);
+        });
+
+        it('should call next()', () => {
+          expect(next.callCount).to.equal(1);
+          expect(next.getCall(0).args).to.deep.equal([err]);
+        });
       });
     });
 
@@ -89,7 +125,7 @@ describe('lib/handlers/index.js', () => {
       beforeEach(async () => {
         validate.returns('Enter a postcode');
 
-        await post(req, res);
+        await post(req, res, next);
       });
 
       it('should call validate()', () => {
