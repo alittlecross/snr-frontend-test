@@ -1,7 +1,7 @@
 const { createSandbox } = require('sinon');
 const { expect } = require('chai');
 
-const { get } = require('../../../../lib/handlers/index');
+const { get, post } = require('../../../../lib/handlers/index');
 
 describe('lib/handlers/index.js', () => {
   let res;
@@ -13,6 +13,7 @@ describe('lib/handlers/index.js', () => {
 
   beforeEach(() => {
     res = {
+      redirect: sandbox.fake(),
       render: sandbox.fake(),
     };
   });
@@ -27,6 +28,15 @@ describe('lib/handlers/index.js', () => {
 
       expect(res.render.callCount).to.equal(1);
       expect(res.render.getCall(0).args).to.deep.equal(['index']);
+    });
+  });
+
+  describe('post()', () => {
+    it('should call res.redirect()', () => {
+      post(null, res);
+
+      expect(res.redirect.callCount).to.equal(1);
+      expect(res.redirect.getCall(0).args).to.deep.equal(['/addresses']);
     });
   });
 });

@@ -8,19 +8,15 @@
 
 {% block content %}
   <h1 class="govuk-heading-xl">Address lookup</h1>
-  <div class="govuk-form-group">
-  <form method="" action="">
-    <label class="govuk-label" for="postcode">
-      Enter a postcode
-    </label>
-    <input class="govuk-input govuk-input--width-10" id="postcode" name="postcode" type="text">
+  <form method="post" autocomplete="off" novalidate>
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="postcode">
+        Enter a postcode
+      </label>
+      <input class="govuk-input govuk-input--width-10" id="postcode" name="postcode" type="text">
     </div>
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
       Find address
     </button>
-    </form> 
-{% endblock %}
-
-{% block bodyEnd %}
-  <script src="javascripts/javascript.js"></script>
+  </form> 
 {% endblock %}
