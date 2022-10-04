@@ -1,8 +1,7 @@
 const app = require('./app');
 
- const { port } = require('./config');
+const { port } = require('./config');
 
- app.listen(port, () => {
-   console.log(`\nlistening on http://localhost:${port}\n`)
- });
- 
+app.listen(port, () => {
+  console.log(`\nlistening on http://localhost:${port}\n`); // eslint-disable-line no-console
+});
