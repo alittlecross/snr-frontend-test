@@ -12,6 +12,7 @@ describe('lib/handlers/index.js', () => {
   let req;
   let res;
   let sandbox;
+  let validate;
 
   before(() => {
     sandbox = createSandbox();
@@ -30,8 +31,11 @@ describe('lib/handlers/index.js', () => {
       render: sandbox.fake(),
     };
 
+    validate = sandbox.stub();
+
     ({ get, post } = proxyquire('../../../../lib/handlers/index', {
       '../api': api,
+      '../validators/index': validate,
     }));
   });
 
@@ -49,20 +53,57 @@ describe('lib/handlers/index.js', () => {
   });
 
   describe('post()', () => {
-    beforeEach(async () => {
-      req.body.postcode = 'NE15 6BW';
+    context('!error', () => {
+      beforeEach(async () => {
+        req.body.postcode = 'NE15 6BW';
 
-      await post(req, res);
+        validate.returns(null);
+
+        await post(req, res);
+      });
+
+      it('should call validate()', () => {
+        expect(validate.callCount).to.equal(1);
+
+        expect(validate.getCall(0).args).to.deep.equal([{
+          postcode: 'NE15 6BW',
+        }]);
+      });
+
+      it('should call api()', () => {
+        expect(api.callCount).to.equal(1);
+        expect(api.getCall(0).args).to.deep.equal(['NE15 6BW']);
+      });
+
+      it('should add the api response to the session', () => {
+        expect(req.session.addresses).to.deep.equal(addresses);
+      });
+
+      it('should call res.redirect()', () => {
+        expect(res.redirect.callCount).to.equal(1);
+        expect(res.redirect.getCall(0).args).to.deep.equal(['/addresses']);
+      });
     });
 
-    it('should call api()', () => {
-      expect(api.callCount).to.equal(1);
-      expect(api.getCall(0).args).to.deep.equal(['NE15 6BW']);
-    });
+    context('error', () => {
+      beforeEach(async () => {
+        validate.returns('Enter a postcode');
 
-    it('should call res.redirect()', () => {
-      expect(res.redirect.callCount).to.equal(1);
-      expect(res.redirect.getCall(0).args).to.deep.equal(['/addresses']);
+        await post(req, res);
+      });
+
+      it('should call validate()', () => {
+        expect(validate.callCount).to.equal(1);
+        expect(validate.getCall(0).args).to.deep.equal([{}]);
+      });
+
+      it('should call res.render()', () => {
+        expect(res.render.callCount).to.equal(1);
+        expect(res.render.getCall(0).args).to.deep.equal(['index', {
+          details: {},
+          error: 'Enter a postcode',
+        }]);
+      });
     });
   });
 });

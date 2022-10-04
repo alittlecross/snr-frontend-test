@@ -1,5 +1,8 @@
 {% extends "govuk/template.njk" %}
 
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
 {% block head %}
   <!--[if !IE 8]><!-->
     <link href="stylesheets/style.css" rel="stylesheet">
@@ -7,14 +10,31 @@
 {% endblock %}
 
 {% block content %}
+  {% if error %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        {
+          text: error,
+          href: "#postcode"
+        }
+      ]
+    }) }}
+  {% endif %}
+
   <h1 class="govuk-heading-xl">Address lookup</h1>
   <form method="post" autocomplete="off" novalidate>
-    <div class="govuk-form-group">
-      <label class="govuk-label" for="postcode">
-        Enter a postcode
-      </label>
-      <input class="govuk-input govuk-input--width-10" id="postcode" name="postcode" type="text">
-    </div>
+    {{ govukInput({
+      label: {
+        text: "Enter a postcode"
+      },
+      id: "postcode",
+      name: "postcode",
+      value: details.postcode,
+      errorMessage: error,
+      classes: "govuk-input--width-10"
+    }) }}
+
     <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
       Find address
     </button>
