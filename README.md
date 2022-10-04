@@ -7,8 +7,11 @@ Prepare your thoughts to discuss how you would mark-up the design (front-end mar
 Please complete the following node based exercise. It should take around 1 hour to complete. Please push the code to a public repository and send us a link to it 24hours before your interview for us to review and discuss.
 
 ## Get started
-$ `npm install`
-$ `DEBUG=frontend-test:* npm start`
+
+```
+$ npm install
+$ npm start
+```
 
 ## Exercise
 Write routes to render `index.njk` and `addresses.njk` in the routes folder.
