@@ -3,7 +3,10 @@ const { expect } = require('chai');
 
 const { get } = require('../../../../lib/handlers/addresses');
 
+const { addresses } = require('../../../stub-data');
+
 describe('lib/handlers/addresses.js', () => {
+  let req;
   let res;
   let sandbox;
 
@@ -12,6 +15,12 @@ describe('lib/handlers/addresses.js', () => {
   });
 
   beforeEach(() => {
+    req = {
+      session: {
+        addresses,
+      },
+    };
+
     res = {
       render: sandbox.fake(),
     };
@@ -23,10 +32,22 @@ describe('lib/handlers/addresses.js', () => {
 
   describe('get()', () => {
     it('should call res.render()', () => {
-      get(null, res);
+      get(req, res);
 
       expect(res.render.callCount).to.equal(1);
-      expect(res.render.getCall(0).args).to.deep.equal(['addresses']);
+
+      expect(res.render.getCall(0).args).to.deep.equal(['addresses', {
+        addresses: [
+          {
+            address: '1, FEATHERWOOD AVENUE, NEWCASTLE UPON TYNE, NE15 6BW',
+            uprn: 4510736476,
+          },
+          {
+            address: '3, FEATHERWOOD AVENUE, NEWCASTLE UPON TYNE, NE15 6BW',
+            uprn: 4510738107,
+          },
+        ],
+      }]);
     });
   });
 });
