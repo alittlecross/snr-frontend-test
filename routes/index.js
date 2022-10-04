@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
-// Handle get and post requests here
+const { get } = require('../lib/handlers/index');
+
+router.get('/', get);
 
 module.exports = router;
